@@ -29,6 +29,14 @@ The key guarantee is an atomic local accounting commit with **at-least-once deli
 
 Requires Python **3.11+**. There are **no third-party runtime dependencies**, accounts, API keys, or external services.
 
+From an existing checkout, the complete demo runs without installation:
+
+```sh
+python3 -m clearinghouse demo
+```
+
+For a fresh checkout with an installed CLI and the full test suite:
+
 ```sh
 git clone https://github.com/bowenzhu21/clearinghouse.git
 cd clearinghouse
