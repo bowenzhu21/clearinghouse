@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "clearinghouse-ledger"
+version = "0.1.0"
+description = "A durable payment-event ledger with a leased outbox and settlement reconciliation"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+authors = [{name = "Bowen Zhu"}]
+dependencies = []
+
+[project.scripts]
+clearinghouse = "clearinghouse.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["clearinghouse*"]
+
+[tool.setuptools.package-data]
+clearinghouse = ["schema.sql"]

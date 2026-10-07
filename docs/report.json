@@ -1,0 +1,737 @@
+{
+  "generated_at": "2026-10-07T20:29:38+00:00",
+  "dataset": "synthetic",
+  "checks": [
+    {
+      "name": "Out-of-order refund is parked",
+      "detail": "A $25 refund arrived before its $100 capture. No journal was created until the dependency arrived.",
+      "passed": true
+    },
+    {
+      "name": "Crash after commit loses no delivery",
+      "detail": "A child process exited with code 23 after the database commit, before delivery. Restart found both journals and both queued messages.",
+      "passed": true
+    },
+    {
+      "name": "Duplicate and conflicting requests are safe",
+      "detail": "Replaying with the same or a new request key produces one journal per provider event. Reusing the key with a changed amount is rejected.",
+      "passed": true
+    },
+    {
+      "name": "An excessive refund cannot overdraw",
+      "detail": "The second refund would bring refunds above the captured amount. It was durably rejected; the provider net remains $75.",
+      "passed": true
+    },
+    {
+      "name": "Consumer commit survives an acknowledgment loss",
+      "detail": "A committed receipt was delivered again after its lease expired. The consumer's durable inbox suppressed the duplicate side effect.",
+      "passed": true
+    },
+    {
+      "name": "Retries end in an audited recovery",
+      "detail": "One message failed twice, entered the dead-letter queue, and was explicitly replayed with a reason after recovery. All messages now have receipts.",
+      "passed": true
+    },
+    {
+      "name": "Settlement differences are classified exactly",
+      "detail": "The provider CSV deliberately contains one duplicate, one missing event, one amount mismatch, one currency mismatch, and one unknown event.",
+      "passed": true
+    },
+    {
+      "name": "Every currency balances after reversal",
+      "detail": "Nine immutable journals, including one accounting reversal, balance across USD, CAD, EUR, and GBP. Provider event history remains intact.",
+      "passed": true
+    }
+  ],
+  "ledger": {
+    "events": [
+      {
+        "event_id": "evt_refund_alpha",
+        "payment_id": "pay_alpha",
+        "kind": "payment.refunded",
+        "amount_cents": 2500,
+        "currency": "USD",
+        "occurred_at": "2026-01-01T12:00:00.000000+00:00",
+        "request_hash": "14676208cd385697eef873ffbcac996038c525e6148870026c355edfccbdc971",
+        "status": "posted",
+        "reason": null,
+        "received_at": 1000.0
+      },
+      {
+        "event_id": "evt_capture_alpha",
+        "payment_id": "pay_alpha",
+        "kind": "payment.captured",
+        "amount_cents": 10000,
+        "currency": "USD",
+        "occurred_at": "2026-01-01T12:00:00.000000+00:00",
+        "request_hash": "e427afcaf55e12952e02a1c589308c9829647f6830ed9fa3f9ddb6308665b743",
+        "status": "posted",
+        "reason": null,
+        "received_at": 1001.0
+      },
+      {
+        "event_id": "evt_capture_beta",
+        "payment_id": "pay_beta",
+        "kind": "payment.captured",
+        "amount_cents": 5000,
+        "currency": "USD",
+        "occurred_at": "2026-01-01T12:00:00.000000+00:00",
+        "request_hash": "3ad6d4a3cdcc8f82facb497d7c2453a654528530bb8f5d9e892449dd1fec9f16",
+        "status": "posted",
+        "reason": null,
+        "received_at": 1003.0
+      },
+      {
+        "event_id": "evt_capture_gamma",
+        "payment_id": "pay_gamma",
+        "kind": "payment.captured",
+        "amount_cents": 3000,
+        "currency": "USD",
+        "occurred_at": "2026-01-01T12:00:00.000000+00:00",
+        "request_hash": "a546c7d974bf7f76eec3f665a9eebbbf72feae902d4c3a4950d256e124de8881",
+        "status": "posted",
+        "reason": null,
+        "received_at": 1004.0
+      },
+      {
+        "event_id": "evt_capture_delta",
+        "payment_id": "pay_delta",
+        "kind": "payment.captured",
+        "amount_cents": 2000,
+        "currency": "CAD",
+        "occurred_at": "2026-01-01T12:00:00.000000+00:00",
+        "request_hash": "47127a8eb81de4493dc4c5234600c5567849c988570d5602705f459bd7b197bf",
+        "status": "posted",
+        "reason": null,
+        "received_at": 1005.0
+      },
+      {
+        "event_id": "evt_capture_epsilon",
+        "payment_id": "pay_epsilon",
+        "kind": "payment.captured",
+        "amount_cents": 4000,
+        "currency": "EUR",
+        "occurred_at": "2026-01-01T12:00:00.000000+00:00",
+        "request_hash": "e7c00f7157167db7ffa70c6fa951e0ba3016143aaa430bf48708bc1558a37720",
+        "status": "posted",
+        "reason": null,
+        "received_at": 1006.0
+      },
+      {
+        "event_id": "evt_capture_zeta",
+        "payment_id": "pay_zeta",
+        "kind": "payment.captured",
+        "amount_cents": 900,
+        "currency": "GBP",
+        "occurred_at": "2026-01-01T12:00:00.000000+00:00",
+        "request_hash": "2e2c8537d2dbc6ebcdf8640d911380e8677257056a47cd7d88e18410f77ec7af",
+        "status": "posted",
+        "reason": null,
+        "received_at": 1007.0
+      },
+      {
+        "event_id": "evt_capture_correction",
+        "payment_id": "pay_correction",
+        "kind": "payment.captured",
+        "amount_cents": 1000,
+        "currency": "USD",
+        "occurred_at": "2026-01-01T12:00:00.000000+00:00",
+        "request_hash": "80a72b168304e107546bb34421747fc0f1e1214c23b06fcb6a1fff84f608cb18",
+        "status": "posted",
+        "reason": null,
+        "received_at": 1008.0
+      },
+      {
+        "event_id": "evt_refund_excess",
+        "payment_id": "pay_alpha",
+        "kind": "payment.refunded",
+        "amount_cents": 8000,
+        "currency": "USD",
+        "occurred_at": "2026-01-01T12:00:00.000000+00:00",
+        "request_hash": "f9e58ab54939f315284ecadb98e792f08763d497cecfbcb638a09c30a713c2a0",
+        "status": "rejected",
+        "reason": "refund_exceeds_capture",
+        "received_at": 1009.0
+      },
+      {
+        "event_id": "evt_refund_waiting",
+        "payment_id": "pay_waiting",
+        "kind": "payment.refunded",
+        "amount_cents": 700,
+        "currency": "USD",
+        "occurred_at": "2026-01-01T12:00:00.000000+00:00",
+        "request_hash": "3518bea3928009d8ae73f8aea4590254f0531a5ded6a69fa8905f8325abf6ca1",
+        "status": "pending",
+        "reason": null,
+        "received_at": 1010.0
+      }
+    ],
+    "journals": [
+      {
+        "journal_id": "3f50fe0dea894f3d8781c6f446ceef42",
+        "event_id": "evt_refund_alpha",
+        "currency": "USD",
+        "reversal_of": null,
+        "reason": "payment.refunded",
+        "created_at": 1001.0
+      },
+      {
+        "journal_id": "ca61308356d644c59d19ee7ab5e3c4dd",
+        "event_id": "evt_capture_alpha",
+        "currency": "USD",
+        "reversal_of": null,
+        "reason": "payment.captured",
+        "created_at": 1001.0
+      },
+      {
+        "journal_id": "e2bd10f0055f4236893e93ccd5390644",
+        "event_id": "evt_capture_beta",
+        "currency": "USD",
+        "reversal_of": null,
+        "reason": "payment.captured",
+        "created_at": 1003.0
+      },
+      {
+        "journal_id": "604a65abff3643b5b15925ef3b878cff",
+        "event_id": "evt_capture_gamma",
+        "currency": "USD",
+        "reversal_of": null,
+        "reason": "payment.captured",
+        "created_at": 1004.0
+      },
+      {
+        "journal_id": "7565be0c283d4b5093ee252e748bdca1",
+        "event_id": "evt_capture_delta",
+        "currency": "CAD",
+        "reversal_of": null,
+        "reason": "payment.captured",
+        "created_at": 1005.0
+      },
+      {
+        "journal_id": "08346efc453f47f582565b626b90808c",
+        "event_id": "evt_capture_epsilon",
+        "currency": "EUR",
+        "reversal_of": null,
+        "reason": "payment.captured",
+        "created_at": 1006.0
+      },
+      {
+        "journal_id": "c05e13f160814acc9120762e0daad9bd",
+        "event_id": "evt_capture_zeta",
+        "currency": "GBP",
+        "reversal_of": null,
+        "reason": "payment.captured",
+        "created_at": 1007.0
+      },
+      {
+        "journal_id": "0f08e11f02bb49a2b08c5c70c98ce86f",
+        "event_id": "evt_capture_correction",
+        "currency": "USD",
+        "reversal_of": null,
+        "reason": "payment.captured",
+        "created_at": 1008.0
+      },
+      {
+        "journal_id": "b9b33e5aaf4d45b2b9d22d032947e412",
+        "event_id": null,
+        "currency": "USD",
+        "reversal_of": "0f08e11f02bb49a2b08c5c70c98ce86f",
+        "reason": "Synthetic example: reverse an accounting posting without issuing a provider refund",
+        "created_at": 1008.0
+      }
+    ],
+    "outbox": [
+      {
+        "job_id": "3547728610154c33bbf89567834b8792",
+        "topic": "journal.posted",
+        "payload_json": "{\"amount_cents\":2500,\"currency\":\"USD\",\"event_id\":\"evt_refund_alpha\",\"journal_id\":\"3f50fe0dea894f3d8781c6f446ceef42\",\"payment_id\":\"pay_alpha\"}",
+        "created_at": 1001.0,
+        "available_at": 1001.0,
+        "attempts": 2,
+        "lease_token": null,
+        "lease_until": null,
+        "delivered_at": 2002.0,
+        "dead_letter_at": null,
+        "last_error": null
+      },
+      {
+        "job_id": "d4eba05552ac4d2dabf60618d7a28fab",
+        "topic": "journal.posted",
+        "payload_json": "{\"amount_cents\":10000,\"currency\":\"USD\",\"event_id\":\"evt_capture_alpha\",\"journal_id\":\"ca61308356d644c59d19ee7ab5e3c4dd\",\"payment_id\":\"pay_alpha\"}",
+        "created_at": 1001.0,
+        "available_at": 2010.0,
+        "attempts": 1,
+        "lease_token": null,
+        "lease_until": null,
+        "delivered_at": 2010.0,
+        "dead_letter_at": null,
+        "last_error": null
+      },
+      {
+        "job_id": "90105d91928040d89583a2080a1c6bc7",
+        "topic": "journal.posted",
+        "payload_json": "{\"amount_cents\":5000,\"currency\":\"USD\",\"event_id\":\"evt_capture_beta\",\"journal_id\":\"e2bd10f0055f4236893e93ccd5390644\",\"payment_id\":\"pay_beta\"}",
+        "created_at": 1003.0,
+        "available_at": 1003.0,
+        "attempts": 1,
+        "lease_token": null,
+        "lease_until": null,
+        "delivered_at": 2002.0,
+        "dead_letter_at": null,
+        "last_error": null
+      },
+      {
+        "job_id": "49467344c51942fdb5578c00ed818a12",
+        "topic": "journal.posted",
+        "payload_json": "{\"amount_cents\":3000,\"currency\":\"USD\",\"event_id\":\"evt_capture_gamma\",\"journal_id\":\"604a65abff3643b5b15925ef3b878cff\",\"payment_id\":\"pay_gamma\"}",
+        "created_at": 1004.0,
+        "available_at": 1004.0,
+        "attempts": 1,
+        "lease_token": null,
+        "lease_until": null,
+        "delivered_at": 2002.0,
+        "dead_letter_at": null,
+        "last_error": null
+      },
+      {
+        "job_id": "f8647c914d794e98b34c7a6e12ced959",
+        "topic": "journal.posted",
+        "payload_json": "{\"amount_cents\":2000,\"currency\":\"CAD\",\"event_id\":\"evt_capture_delta\",\"journal_id\":\"7565be0c283d4b5093ee252e748bdca1\",\"payment_id\":\"pay_delta\"}",
+        "created_at": 1005.0,
+        "available_at": 1005.0,
+        "attempts": 1,
+        "lease_token": null,
+        "lease_until": null,
+        "delivered_at": 2002.0,
+        "dead_letter_at": null,
+        "last_error": null
+      },
+      {
+        "job_id": "efba2143d41e441aad4538d6649dd697",
+        "topic": "journal.posted",
+        "payload_json": "{\"amount_cents\":4000,\"currency\":\"EUR\",\"event_id\":\"evt_capture_epsilon\",\"journal_id\":\"08346efc453f47f582565b626b90808c\",\"payment_id\":\"pay_epsilon\"}",
+        "created_at": 1006.0,
+        "available_at": 1006.0,
+        "attempts": 1,
+        "lease_token": null,
+        "lease_until": null,
+        "delivered_at": 2002.0,
+        "dead_letter_at": null,
+        "last_error": null
+      },
+      {
+        "job_id": "35cb363a543345b28fc2dbb404dd379b",
+        "topic": "journal.posted",
+        "payload_json": "{\"amount_cents\":900,\"currency\":\"GBP\",\"event_id\":\"evt_capture_zeta\",\"journal_id\":\"c05e13f160814acc9120762e0daad9bd\",\"payment_id\":\"pay_zeta\"}",
+        "created_at": 1007.0,
+        "available_at": 1007.0,
+        "attempts": 1,
+        "lease_token": null,
+        "lease_until": null,
+        "delivered_at": 2002.0,
+        "dead_letter_at": null,
+        "last_error": null
+      },
+      {
+        "job_id": "437b001b01c34dfc8e69f0c31421a9ab",
+        "topic": "journal.reversed",
+        "payload_json": "{\"journal_id\":\"b9b33e5aaf4d45b2b9d22d032947e412\",\"reason\":\"Synthetic example: reverse an accounting posting without issuing a provider refund\",\"reversal_of\":\"0f08e11f02bb49a2b08c5c70c98ce86f\"}",
+        "created_at": 1008.0,
+        "available_at": 1008.0,
+        "attempts": 1,
+        "lease_token": null,
+        "lease_until": null,
+        "delivered_at": 2002.0,
+        "dead_letter_at": null,
+        "last_error": null
+      },
+      {
+        "job_id": "cf49cf5f4c8c47de8b4b186a1be308ff",
+        "topic": "journal.posted",
+        "payload_json": "{\"amount_cents\":1000,\"currency\":\"USD\",\"event_id\":\"evt_capture_correction\",\"journal_id\":\"0f08e11f02bb49a2b08c5c70c98ce86f\",\"payment_id\":\"pay_correction\"}",
+        "created_at": 1008.0,
+        "available_at": 1008.0,
+        "attempts": 1,
+        "lease_token": null,
+        "lease_until": null,
+        "delivered_at": 2002.0,
+        "dead_letter_at": null,
+        "last_error": null
+      },
+      {
+        "job_id": "46704f9463e1441a91f207a8653639f8",
+        "topic": "event.rejected",
+        "payload_json": "{\"event_id\":\"evt_refund_excess\",\"reason\":\"refund_exceeds_capture\"}",
+        "created_at": 1009.0,
+        "available_at": 1009.0,
+        "attempts": 1,
+        "lease_token": null,
+        "lease_until": null,
+        "delivered_at": 2002.0,
+        "dead_letter_at": null,
+        "last_error": null
+      }
+    ],
+    "journal_lines": [
+      {
+        "journal_id": "08346efc453f47f582565b626b90808c",
+        "line_number": 1,
+        "account": "processor_receivable",
+        "currency": "EUR",
+        "debit_cents": 4000,
+        "credit_cents": 0
+      },
+      {
+        "journal_id": "08346efc453f47f582565b626b90808c",
+        "line_number": 2,
+        "account": "merchant_payable",
+        "currency": "EUR",
+        "debit_cents": 0,
+        "credit_cents": 4000
+      },
+      {
+        "journal_id": "0f08e11f02bb49a2b08c5c70c98ce86f",
+        "line_number": 1,
+        "account": "processor_receivable",
+        "currency": "USD",
+        "debit_cents": 1000,
+        "credit_cents": 0
+      },
+      {
+        "journal_id": "0f08e11f02bb49a2b08c5c70c98ce86f",
+        "line_number": 2,
+        "account": "merchant_payable",
+        "currency": "USD",
+        "debit_cents": 0,
+        "credit_cents": 1000
+      },
+      {
+        "journal_id": "3f50fe0dea894f3d8781c6f446ceef42",
+        "line_number": 1,
+        "account": "merchant_payable",
+        "currency": "USD",
+        "debit_cents": 2500,
+        "credit_cents": 0
+      },
+      {
+        "journal_id": "3f50fe0dea894f3d8781c6f446ceef42",
+        "line_number": 2,
+        "account": "processor_receivable",
+        "currency": "USD",
+        "debit_cents": 0,
+        "credit_cents": 2500
+      },
+      {
+        "journal_id": "604a65abff3643b5b15925ef3b878cff",
+        "line_number": 1,
+        "account": "processor_receivable",
+        "currency": "USD",
+        "debit_cents": 3000,
+        "credit_cents": 0
+      },
+      {
+        "journal_id": "604a65abff3643b5b15925ef3b878cff",
+        "line_number": 2,
+        "account": "merchant_payable",
+        "currency": "USD",
+        "debit_cents": 0,
+        "credit_cents": 3000
+      },
+      {
+        "journal_id": "7565be0c283d4b5093ee252e748bdca1",
+        "line_number": 1,
+        "account": "processor_receivable",
+        "currency": "CAD",
+        "debit_cents": 2000,
+        "credit_cents": 0
+      },
+      {
+        "journal_id": "7565be0c283d4b5093ee252e748bdca1",
+        "line_number": 2,
+        "account": "merchant_payable",
+        "currency": "CAD",
+        "debit_cents": 0,
+        "credit_cents": 2000
+      },
+      {
+        "journal_id": "b9b33e5aaf4d45b2b9d22d032947e412",
+        "line_number": 1,
+        "account": "processor_receivable",
+        "currency": "USD",
+        "debit_cents": 0,
+        "credit_cents": 1000
+      },
+      {
+        "journal_id": "b9b33e5aaf4d45b2b9d22d032947e412",
+        "line_number": 2,
+        "account": "merchant_payable",
+        "currency": "USD",
+        "debit_cents": 1000,
+        "credit_cents": 0
+      },
+      {
+        "journal_id": "c05e13f160814acc9120762e0daad9bd",
+        "line_number": 1,
+        "account": "processor_receivable",
+        "currency": "GBP",
+        "debit_cents": 900,
+        "credit_cents": 0
+      },
+      {
+        "journal_id": "c05e13f160814acc9120762e0daad9bd",
+        "line_number": 2,
+        "account": "merchant_payable",
+        "currency": "GBP",
+        "debit_cents": 0,
+        "credit_cents": 900
+      },
+      {
+        "journal_id": "ca61308356d644c59d19ee7ab5e3c4dd",
+        "line_number": 1,
+        "account": "processor_receivable",
+        "currency": "USD",
+        "debit_cents": 10000,
+        "credit_cents": 0
+      },
+      {
+        "journal_id": "ca61308356d644c59d19ee7ab5e3c4dd",
+        "line_number": 2,
+        "account": "merchant_payable",
+        "currency": "USD",
+        "debit_cents": 0,
+        "credit_cents": 10000
+      },
+      {
+        "journal_id": "e2bd10f0055f4236893e93ccd5390644",
+        "line_number": 1,
+        "account": "processor_receivable",
+        "currency": "USD",
+        "debit_cents": 5000,
+        "credit_cents": 0
+      },
+      {
+        "journal_id": "e2bd10f0055f4236893e93ccd5390644",
+        "line_number": 2,
+        "account": "merchant_payable",
+        "currency": "USD",
+        "debit_cents": 0,
+        "credit_cents": 5000
+      }
+    ],
+    "balance": [
+      {
+        "currency": "CAD",
+        "debit_cents": 2000,
+        "credit_cents": 2000,
+        "difference_cents": 0
+      },
+      {
+        "currency": "EUR",
+        "debit_cents": 4000,
+        "credit_cents": 4000,
+        "difference_cents": 0
+      },
+      {
+        "currency": "GBP",
+        "debit_cents": 900,
+        "credit_cents": 900,
+        "difference_cents": 0
+      },
+      {
+        "currency": "USD",
+        "debit_cents": 22500,
+        "credit_cents": 22500,
+        "difference_cents": 0
+      }
+    ]
+  },
+  "consumer_receipts": 10,
+  "reconciliation": {
+    "provider_row_count": 9,
+    "expected_event_count": 8,
+    "counts": {
+      "exact": 4,
+      "duplicate": 1,
+      "missing": 1,
+      "amount_mismatch": 1,
+      "currency_mismatch": 1,
+      "unexpected": 1
+    },
+    "results": [
+      {
+        "event_id": "evt_capture_alpha",
+        "category": "exact",
+        "expected": {
+          "event_id": "evt_capture_alpha",
+          "amount_cents": 10000,
+          "currency": "USD"
+        },
+        "provider_rows": [
+          {
+            "settlement_id": "st_01",
+            "event_id": "evt_capture_alpha",
+            "amount_cents": 10000,
+            "currency": "USD",
+            "line_number": 2
+          }
+        ]
+      },
+      {
+        "event_id": "evt_capture_beta",
+        "category": "duplicate",
+        "expected": {
+          "event_id": "evt_capture_beta",
+          "amount_cents": 5000,
+          "currency": "USD"
+        },
+        "provider_rows": [
+          {
+            "settlement_id": "st_03",
+            "event_id": "evt_capture_beta",
+            "amount_cents": 5000,
+            "currency": "USD",
+            "line_number": 4
+          },
+          {
+            "settlement_id": "st_04",
+            "event_id": "evt_capture_beta",
+            "amount_cents": 5000,
+            "currency": "USD",
+            "line_number": 5
+          }
+        ]
+      },
+      {
+        "event_id": "evt_capture_correction",
+        "category": "exact",
+        "expected": {
+          "event_id": "evt_capture_correction",
+          "amount_cents": 1000,
+          "currency": "USD"
+        },
+        "provider_rows": [
+          {
+            "settlement_id": "st_09",
+            "event_id": "evt_capture_correction",
+            "amount_cents": 1000,
+            "currency": "USD",
+            "line_number": 10
+          }
+        ]
+      },
+      {
+        "event_id": "evt_capture_delta",
+        "category": "amount_mismatch",
+        "expected": {
+          "event_id": "evt_capture_delta",
+          "amount_cents": 2000,
+          "currency": "CAD"
+        },
+        "provider_rows": [
+          {
+            "settlement_id": "st_06",
+            "event_id": "evt_capture_delta",
+            "amount_cents": 2100,
+            "currency": "CAD",
+            "line_number": 7
+          }
+        ]
+      },
+      {
+        "event_id": "evt_capture_epsilon",
+        "category": "currency_mismatch",
+        "expected": {
+          "event_id": "evt_capture_epsilon",
+          "amount_cents": 4000,
+          "currency": "EUR"
+        },
+        "provider_rows": [
+          {
+            "settlement_id": "st_07",
+            "event_id": "evt_capture_epsilon",
+            "amount_cents": 4000,
+            "currency": "USD",
+            "line_number": 8
+          }
+        ]
+      },
+      {
+        "event_id": "evt_capture_gamma",
+        "category": "exact",
+        "expected": {
+          "event_id": "evt_capture_gamma",
+          "amount_cents": 3000,
+          "currency": "USD"
+        },
+        "provider_rows": [
+          {
+            "settlement_id": "st_05",
+            "event_id": "evt_capture_gamma",
+            "amount_cents": 3000,
+            "currency": "USD",
+            "line_number": 6
+          }
+        ]
+      },
+      {
+        "event_id": "evt_capture_zeta",
+        "category": "missing",
+        "expected": {
+          "event_id": "evt_capture_zeta",
+          "amount_cents": 900,
+          "currency": "GBP"
+        },
+        "provider_rows": []
+      },
+      {
+        "event_id": "evt_provider_unknown",
+        "category": "unexpected",
+        "expected": null,
+        "provider_rows": [
+          {
+            "settlement_id": "st_08",
+            "event_id": "evt_provider_unknown",
+            "amount_cents": 1200,
+            "currency": "USD",
+            "line_number": 9
+          }
+        ]
+      },
+      {
+        "event_id": "evt_refund_alpha",
+        "category": "exact",
+        "expected": {
+          "event_id": "evt_refund_alpha",
+          "amount_cents": -2500,
+          "currency": "USD"
+        },
+        "provider_rows": [
+          {
+            "settlement_id": "st_02",
+            "event_id": "evt_refund_alpha",
+            "amount_cents": -2500,
+            "currency": "USD",
+            "line_number": 3
+          }
+        ]
+      }
+    ]
+  },
+  "benchmark": {
+    "environment": {
+      "python": "3.13.5",
+      "sqlite": "3.49.1",
+      "os": "Darwin",
+      "os_release": "25.6.0",
+      "architecture": "arm64"
+    },
+    "operations": 200,
+    "elapsed_seconds": 0.164708,
+    "operations_per_second": 1214.27,
+    "p50_ms": 0.784,
+    "p95_ms": 1.215,
+    "journal_count": 200,
+    "balanced": true,
+    "method": "Sequential unique captures; local SQLite WAL, synchronous=FULL, one connection per ingest; includes event, journal, idempotency and outbox commit; no HTTP, delivery, warmup, or network storage."
+  }
+}
