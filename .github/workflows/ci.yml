@@ -1,0 +1,34 @@
+name: correctness
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.11', '3.12']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: python -m unittest discover -v
+      - run: python -m clearinghouse demo --operations 30
+      - run: python -m pip wheel . --no-deps --wheel-dir dist
+      - name: Smoke test installed wheel outside source tree
+        shell: bash
+        run: |
+          python -m venv /tmp/clearinghouse-wheel
+          /tmp/clearinghouse-wheel/bin/pip install dist/*.whl
+          cd /tmp
+          /tmp/clearinghouse-wheel/bin/python -m clearinghouse demo --output wheel-demo --operations 5
+      - uses: actions/upload-artifact@v4
+        with:
+          name: demo-evidence-python-${{ matrix.python-version }}
+          path: |
+            demo-output/report.html
+            demo-output/report.json
+            demo-output/settlement.csv
